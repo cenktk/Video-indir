@@ -12,13 +12,8 @@ if (!classroomUrl) {
   process.exit(2);
 }
 
-function safeName(name) {
-  return String(name || 'Course Material')
-    .replace(/[/:]/g, '-')
-    .replace(/[?*"<>|]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
+const { safeName: sharedSafeName } = require('./safe_name');
+const safeName = name => sharedSafeName(name, 'Course Material');
 
 function walkCourse(node, section, rows, courseTitle = '') {
   if (!node) return;

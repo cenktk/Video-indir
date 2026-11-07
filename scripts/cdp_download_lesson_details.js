@@ -83,13 +83,8 @@ function comparableTitle(name) {
     .toLowerCase();
 }
 
-function safeName(name) {
-  return String(name || 'Untitled')
-    .replace(/[/:]/g, '-')
-    .replace(/[?*"<>|]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
+const { safeName: sharedSafeName } = require('./safe_name');
+const safeName = name => sharedSafeName(name, 'Untitled');
 
 function escapeHtml(value = '') {
   return String(value)

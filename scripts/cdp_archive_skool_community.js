@@ -26,14 +26,7 @@ const feedAssets = !textOnly && !args.includes('--no-feed-assets');
 const maxAttachmentMb = Number((args.find(arg => arg.startsWith('--max-mb=')) || '').split('=')[1] || process.env.MAX_ATTACHMENT_MB || 30);
 const concurrency = Math.max(1, Number((args.find(arg => arg.startsWith('--concurrency=')) || '').split('=')[1] || (textOnly ? 6 : 1)));
 
-function safeName(name, fallback = 'item') {
-  const cleaned = String(name || fallback)
-    .replace(/[/:]/g, '-')
-    .replace(/[?*"<>|]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return cleaned || fallback;
-}
+const { safeName } = require('./safe_name');
 
 function slugName(name) {
   return safeName(String(name || 'post').toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, ''), 'post');

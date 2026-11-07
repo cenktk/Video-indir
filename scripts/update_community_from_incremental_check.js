@@ -11,14 +11,7 @@ const checkPath = process.argv[2] || path.join(postsRoot, 'incremental-check-202
 const feedPath = path.join(postsRoot, 'community-feed.json');
 const assetsRoot = path.join(postsRoot, '_community-feed-assets');
 
-function safeName(name, fallback = 'item') {
-  const cleaned = String(name || fallback)
-    .replace(/[/:]/g, '-')
-    .replace(/[?*"<>|]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return cleaned || fallback;
-}
+const { safeName } = require('./safe_name');
 
 function slugName(name) {
   return safeName(String(name || 'post').toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, ''), 'post');

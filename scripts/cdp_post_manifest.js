@@ -14,14 +14,8 @@ if (!postUrl) {
 }
 
 // Same rules as the other scripts, so videos land under the usual course folder name.
-function safeName(name, fallback = 'Skool Post') {
-  const cleaned = String(name || fallback)
-    .replace(/[/:]/g, '-')
-    .replace(/[?*"<>|]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return cleaned || fallback;
-}
+const { safeName: sharedSafeName } = require('./safe_name');
+const safeName = (name, fallback = 'Skool Post') => sharedSafeName(name, fallback);
 
 function formatDuration(ms) {
   const total = Math.floor(Number(ms || 0) / 1000);

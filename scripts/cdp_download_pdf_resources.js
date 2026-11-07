@@ -43,13 +43,8 @@ function comparableTitle(name) {
     .toLowerCase();
 }
 
-function safeName(name) {
-  return name
-    .replace(/[/:]/g, '-')
-    .replace(/[?*"<>|]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
+const { safeName: sharedSafeName } = require('./safe_name');
+const safeName = name => sharedSafeName(name, 'Untitled');
 
 function walkCourse(node, section, rows) {
   const course = node.course || {};

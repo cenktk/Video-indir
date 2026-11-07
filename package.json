@@ -21,9 +21,10 @@
     "playwright": "^1.44.0"
   },
   "scripts": {
-    "test": "node --test ui/test/*.test.js && python3 ui/test/test_transcribe.py && python3 ui/test/test_download_video_url.py",
+    "test": "node --test ui/test/*.test.js && python3 ui/test/test_transcribe.py && python3 ui/test/test_download_video_url.py && python3 ui/test/test_safe_name.py",
     "ui": "node ui/server.js",
     "doctor": "node scripts/doctor.js",
+    "app": "bash mac/build-app.sh",
     "launch:brave": "bash ./scripts/launch_brave_cdp.sh",
     "inspect": "node scripts/cdp_inspect.js",
     "course:state": "node scripts/cdp_course_state.js",

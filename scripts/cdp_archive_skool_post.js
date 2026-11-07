@@ -22,14 +22,7 @@ const prefetchPath = process.env.SKOOL_PREFETCH_PATH || '';
 const cdpUrl = process.env.SKOOL_CDP_URL || 'http://127.0.0.1:9222';
 const fetchComments = process.env.SKOOL_FETCH_COMMENTS !== '0';
 
-function safeName(name, fallback = 'item') {
-  const cleaned = String(name || fallback)
-    .replace(/[/:]/g, '-')
-    .replace(/[?*"<>|]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return cleaned || fallback;
-}
+const { safeName } = require('./safe_name');
 
 function slugName(name) {
   return safeName(String(name || 'post').toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, ''), 'post');

@@ -58,3 +58,6 @@ manifest.json
 .env
 .env.*
 !.env.example
+
+# macOS launcher built by npm run app
+Video-indir.app/

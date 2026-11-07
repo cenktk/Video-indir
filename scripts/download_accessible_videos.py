@@ -178,14 +178,17 @@ def load_manifest() -> list:
 
 
 def safe_name(name: str) -> str:
-    return name.replace("/", "-").replace(":", "꞉").strip()
+    name = name.replace("/", "-").replace("\\", "-").replace(":", "꞉").strip()
+    # A leading dot makes "." or ".." a path component that resolves outside the folder.
+    return name.lstrip(". ")
 
 
 def course_dir_name(name: str) -> str:
     """Same rules as safeName() in the Node scripts, so videos and notes land in one course folder."""
-    name = re.sub(r"[/:]", "-", name or "Course Material")
+    name = re.sub(r"[/\\:]", "-", name or "Course Material")
     name = re.sub(r'[?*"<>|]', "", name)
-    return re.sub(r"\s+", " ", name).strip()
+    name = re.sub(r"\s+", " ", name).strip().lstrip(". ")
+    return name or "Course Material"
 
 
 def target_path(item: dict) -> Path:

@@ -58,6 +58,16 @@ Set `WHISPER_MODEL` (default `base`) to change the model. The first run download
 
 The server listens on `127.0.0.1` only. Every request needs a token that is generated at start-up and embedded in the page, and the Host and Origin headers must be local. A website you visit cannot start downloads.
 
+## macOS app
+
+```bash
+npm run app        # builds Video-indir.app in this folder
+```
+
+Double-click `Video-indir.app` to start the UI and open it in your browser. Double-click it again while it runs to open the page or stop the server. The server log is `~/Library/Logs/Video-indir.log`.
+
+This is a small launcher, not a self-contained app. It needs Node, Python, `yt-dlp` and `ffmpeg` on this Mac (`npm run doctor` checks them), and it points at this checkout, so rebuild it if you move the folder. It is unsigned, which is fine for an app you built yourself. The first time, macOS may ask you to allow it in Privacy & Security.
+
 ## Using it with an AI agent
 
 Give the repo URL to Codex or Claude Code. They read [`AGENTS.md`](AGENTS.md) (Claude Code through `CLAUDE.md`), install the tools and run `npm run doctor`. The one step an agent cannot do is logging in to Skool or LinkedIn in the browser window, so it will ask you.
