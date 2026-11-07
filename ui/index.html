@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skool İndirici</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1v9m0 0L4 6m4 4 4-4M2 14h12' stroke='%234f9dff' stroke-width='2' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#fafafa;--card:#fff;--fg:#1a1d21;--muted:#6b7580;--line:#e3e6ea;--accent:#2f7de1;--ok:#1a9a5a;--bad:#d64545}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1116;--card:#161b22;--fg:#e6edf3;--muted:#9aa7b4;--line:#232a33;--accent:#4f9dff;--ok:#3fb97a;--bad:#f06a6a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.4rem;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.9rem;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bad);display:inline-block;margin-right:6px}
+.dot.on{background:var(--ok)}
+textarea,select,input[type=text]{width:100%;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit}
+textarea{min-height:96px;resize:vertical}
+textarea:focus,select:focus,input:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.opts{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.opts select{width:auto}.opts input[type=text]{width:160px}
+label{display:flex;gap:6px;align-items:center;color:var(--muted)}
+label.off{opacity:.5}
+button{font:inherit;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 14px;cursor:pointer;min-height:36px}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button.link{border:0;background:none;color:var(--accent);padding:0;min-height:0}
+ul{list-style:none;padding:0;margin:28px 0 0}
+li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.url{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.meta{color:var(--muted);font-size:.85rem}
+.st{font-size:.85rem;white-space:nowrap}
+.st.bitti{color:var(--ok)}.st.hata{color:var(--bad)}
+pre{margin:10px 0 0;max-height:220px;overflow:auto;font-size:.8rem;color:var(--muted);white-space:pre-wrap;word-break:break-all}
+.empty{color:var(--muted);text-align:center;padding:24px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Skool İndirici</h1>
+  <div class="sub">
+    <span><span class="dot" id="dot"></span><span id="cdp">Tarayıcı bağlı değil</span></span>
+    <button class="link" id="brave" hidden>Brave'i başlat</button>
+    <span id="root"></span>
+  </div>
+
+  <textarea id="urls" placeholder="Bağlantıları yapıştır, her satıra bir tane" aria-label="Bağlantılar"></textarea>
+  <div class="opts">
+    <select id="quality" aria-label="Kalite"><option>1080p</option><option>720p</option><option>best</option></select>
+    <input type="text" id="folder" placeholder="Klasör (Videos / Skool Community)" aria-label="Klasör">
+    <label><input type="checkbox" id="audioOnly"> Sadece ses</label>
+    <label><input type="checkbox" id="embedSubs"> Altyazıyı videoya göm</label>
+    <label id="trLabel"><input type="checkbox" id="transcribe"> Transkript</label>
+    <button class="primary" id="add">Sıraya ekle</button>
+  </div>
+
+  <ul id="jobs"></ul>
+</main>
+<script>
+const T = '__TOKEN__';
+const $ = id => document.getElementById(id);
+const post = (p, b) => fetch(`/api/${p}?t=${T}`, {method: 'POST', body: JSON.stringify(b)}).then(r => r.json());
+const open = new Set();
+
+$('add').onclick = async () => {
+  const r = await post('add', {urls: $('urls').value, opts: {
+    quality: $('quality').value, folder: $('folder').value, audioOnly: $('audioOnly').checked,
+    embedSubs: $('embedSubs').checked, transcribe: $('transcribe').checked}});
+  $('urls').value = r.rejected.length ? r.rejected.join('\n') : '';
+  if (r.rejected.length) $('urls').placeholder = 'Geçersiz bağlantılar yukarıda kaldı';
+};
+$('brave').onclick = () => post('brave', {});
+
+function render(s) {
+  $('dot').className = 'dot' + (s.cdp ? ' on' : '');
+  $('cdp').textContent = s.cdp ? 'Tarayıcı bağlı' : 'Tarayıcı bağlı değil (Skool için gerekli)';
+  $('brave').hidden = s.cdp;
+  $('root').textContent = s.root;
+  $('trLabel').className = s.whisper ? '' : 'off';
+  $('transcribe').disabled = !s.whisper;
+  $('trLabel').title = s.whisper ? '' : 'Kurulu değil: python3 -m venv .venv && .venv/bin/pip install faster-whisper';
+  const ul = $('jobs');
+  ul.replaceChildren();
+  if (!s.jobs.length) { ul.innerHTML = '<div class="empty">Sıra boş</div>'; return; }
+  const logs = [];
+  for (const j of [...s.jobs].reverse()) {
+    const li = document.createElement('li');
+    const last = j.log[j.log.length - 1] || '';
+    li.innerHTML = `<div class="row"><div class="url"></div><div class="row"><span class="st ${j.status}">${j.status}</span></div></div><div class="meta"></div>`;
+    li.querySelector('.url').textContent = j.url;
+    li.querySelector('.meta').textContent = `${j.kind}${last ? ' · ' + last.slice(0, 90) : ''}`;
+    const actions = li.querySelector('.row .row');
+    if (['bekliyor', 'çalışıyor'].includes(j.status)) {
+      const b = document.createElement('button'); b.className = 'link'; b.textContent = 'İptal';
+      b.onpointerdown = () => post('cancel', {id: j.id}); actions.append(b);
+    }
+    if (j.log.length) {
+      const b = document.createElement('button'); b.className = 'link'; b.textContent = open.has(j.id) ? 'Günlüğü gizle' : 'Günlük';
+      b.onpointerdown = () => { open.has(j.id) ? open.delete(j.id) : open.add(j.id); render(s); }; actions.prepend(b);
+      if (open.has(j.id)) { const p = document.createElement('pre'); p.textContent = j.log.join('\n'); li.append(p); logs.push(p); }
+    }
+    ul.append(li);
+  }
+  for (const p of logs) p.scrollTop = p.scrollHeight;
+}
+new EventSource(`/api/events?t=${T}`).onmessage = e => render(JSON.parse(e.data));
+</script>
+</body>
+</html>

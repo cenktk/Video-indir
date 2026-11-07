@@ -1,0 +1,60 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Downloaded / archived media artifacts — keep these local only, never commit.
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.m4a
+*.mp3
+*.wav
+*.pdf
+*.zip
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.part
+
+# Local run output, session data, logs, signed URLs, screenshots.
+*.log
+cdp-inspect.json
+course-state.json
+lesson-details.json
+pdf-resources.json
+capture-*.json
+playwright-skool-inspect.json
+.skool-archive-chrome/
+.skool-archive-brave/
+Skool-Backup/
+# Default archive folder (SKOOL_COLLECTION_NAME) and the local browser profile
+# folder — they hold real course notes, posts and session data.
+Skool Community/
+Служебные файлы - можно не трогать/
+output/
+archive/
+# Local output folder (SKOOL_ARCHIVE_ROOT default in .env): holds downloaded
+# course material and posts, which must never be committed.
+out/
+package-lock.json
+
+# User-created manifest may describe real course content — keep local.
+manifest.json
+
+# Environment variables and secrets — keep local.
+.env
+.env.*
+!.env.example
